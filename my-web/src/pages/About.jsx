@@ -55,7 +55,7 @@ const About = () => {
                 </div>
             </section>
 
-            <section className="contact-section" id="contact">
+            {/* <section className="contact-section" id="contact">
                 <div className="contact-container">
                     <h2>Contact Me</h2>
                     <p className="contact-intro">Tell me about your vision and I'll help plan your shoot.</p>
@@ -89,7 +89,7 @@ const About = () => {
                         </button>
                     </form>
                 </div>
-            </section>
+            </section> */}
         </main>
     );
 };
