@@ -1,0 +1,143 @@
+.client-gallery-hero {
+    background: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)),
+        url('../images/ChatGPT Image Feb 8, 2026, 09_42_09 PM.png') center/cover no-repeat;
+    min-height: 360px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 6px solid var(--separator-color);
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.client-gallery-hero-content {
+    text-align: center;
+    background-color: var(--color-cream-opaque);
+    padding: 34px 74px;
+    border-radius: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.client-gallery-hero-content h1 {
+    margin: 0;
+    font-size: 48px;
+    text-shadow: var(--text-shadow);
+}
+
+.client-gallery-hero-image {
+    display: none;
+}
+
+.gallery-section,
+.reviews-section {
+    padding: 60px 40px;
+    border-top: 6px solid var(--separator-color);
+}
+
+.gallery-container,
+.reviews-container {
+    width: 96%;
+    max-width: 1400px;
+    margin: 0 auto;
+    background: var(--color-cream);
+    border-radius: 18px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(43, 43, 39, 0.04);
+    padding: 40px 44px;
+}
+
+.gallery-container h2,
+.reviews-container h2 {
+    margin: 0 0 22px;
+    font-size: 42px;
+    text-shadow: var(--text-shadow);
+}
+
+.gallery-grid,
+.reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.gallery-grid img {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border: 3px solid var(--nav-2);
+    border-radius: 16px;
+}
+
+.review-card {
+    background: var(--nav-4);
+    color: var(--nav-1);
+    border-radius: 14px;
+    padding: 22px;
+}
+
+.review-card p {
+    margin: 0;
+    font-size: 19px;
+    line-height: 1.6;
+}
+
+.review-card h3 {
+    margin: 12px 0 0;
+    font-size: 17px;
+}
+
+.client-gallery-book-button {
+    display: inline-block;
+    margin-top: 24px;
+    background: linear-gradient(135deg, var(--nav-3) 0%, var(--nav-4) 100%);
+    color: var(--nav-1);
+    padding: 14px 40px;
+    font-size: 18px;
+    border-radius: 30px;
+    text-decoration: none;
+    box-shadow: 0 8px 20px rgba(38, 45, 22, 0.22);
+    transition: filter 0.18s ease;
+}
+
+.client-gallery-book-button:hover {
+    filter: brightness(0.9);
+}
+
+@media (max-width: 960px) {
+    .gallery-grid,
+    .reviews-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .client-gallery-hero-content {
+        padding: 28px 32px;
+    }
+
+    .client-gallery-hero-content h1 {
+        font-size: 34px;
+    }
+
+    .gallery-section,
+    .reviews-section {
+        padding: 40px 20px;
+    }
+
+    .gallery-container,
+    .reviews-container {
+        padding: 28px 24px;
+    }
+
+    .gallery-container h2,
+    .reviews-container h2 {
+        font-size: 32px;
+    }
+
+    .gallery-grid,
+    .reviews-grid {
+        grid-template-columns: 1fr;
+    }
+}
