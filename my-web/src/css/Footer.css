@@ -1,0 +1,13 @@
+.site-footer {
+    background: linear-gradient(90deg, var(--nav-2) 0%, var(--nav-4) 35%, var(--nav-3) 70%, var(--nav-1) 100%);
+    color: var(--color-cream);
+    text-align: center;
+    padding: 30px;
+    font-size: 16px;
+    border-top: 6px solid var(--nav-1);
+}
+
+.site-footer p {
+    margin: 0;
+    text-shadow: var(--text-shadow);
+}
