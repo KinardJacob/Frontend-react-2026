@@ -1,0 +1,219 @@
+.services-hero {
+    background: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)),
+        url('../images/ChatGPT Image Feb 8, 2026, 10_17_06 PM.png') center/cover no-repeat;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 6px solid var(--separator-color);
+    padding: 24px;
+}
+
+.services-hero-content {
+    text-align: center;
+    background-color: var(--color-cream-opaque);
+    padding: 40px 80px;
+    border-radius: 20px;
+    max-width: 700px;
+}
+
+.services-hero-content h1 {
+    margin: 0;
+    font-size: 48px;
+    color: var(--site-text);
+    font-weight: 700;
+    text-shadow: var(--text-shadow);
+}
+
+.pricing-section,
+.details-section,
+.packages-section {
+    padding: 50px 40px;
+    background-color: var(--color-bg);
+}
+
+.pricing-grid,
+.details-panel,
+.packages-container {
+    width: 96%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 36px;
+    align-items: start;
+}
+
+.plan-card,
+.details-panel,
+.packages-container {
+    background: var(--color-cream);
+    border-radius: 18px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(43, 43, 39, 0.04);
+}
+
+.plan-card {
+    padding: 30px 24px;
+    text-align: center;
+}
+
+.plan-card h3 {
+    margin: 0 0 12px;
+    font-size: 28px;
+}
+
+.price-badge {
+    display: inline-block;
+    background: var(--nav-4);
+    color: var(--nav-1);
+    font-size: 32px;
+    padding: 20px 30px;
+    border-radius: 18px;
+    margin: 12px 0 18px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.plan-features {
+    margin: 0 0 26px;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.services-book-button {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--nav-3) 0%, var(--nav-4) 100%);
+    color: var(--nav-1);
+    padding: 14px 50px;
+    font-size: 18px;
+    border-radius: 30px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 8px 20px rgba(38, 45, 22, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transition: filter 0.18s ease;
+}
+
+.services-book-button:hover {
+    filter: brightness(0.9);
+}
+
+.details-section {
+    padding-top: 0;
+    padding-bottom: 80px;
+}
+
+.details-panel,
+.packages-container {
+    padding: 32px 36px;
+}
+
+.details-panel h2,
+.packages-container h2 {
+    margin: 0 0 24px;
+    text-align: center;
+    font-size: 36px;
+}
+
+.details-grid,
+.packages-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px;
+}
+
+.details-box {
+    background: var(--nav-4);
+    color: var(--nav-1);
+    padding: 22px;
+    border-radius: 12px;
+    font-weight: 700;
+}
+
+.details-box ul {
+    margin: 0;
+    padding-left: 18px;
+    line-height: 1.9;
+}
+
+.packages-section {
+    padding-top: 0;
+    padding-bottom: 80px;
+}
+
+.packages-intro {
+    margin: 0 0 22px;
+    text-align: center;
+    font-size: 20px;
+}
+
+.session-package-card {
+    background-color: var(--color-white);
+    border: 2px solid var(--nav-2);
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.session-package-card img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border: none;
+}
+
+.session-package-content {
+    padding: 14px;
+}
+
+.session-package-content h3 {
+    margin: 0 0 8px;
+    font-size: 24px;
+}
+
+.session-package-meta {
+    margin: 0 0 8px;
+    font-size: 16px;
+    color: var(--nav-4);
+}
+
+.session-package-price {
+    margin: 10px 0 0;
+    font-size: 20px;
+    color: var(--nav-4);
+}
+
+@media (max-width: 900px) {
+    .pricing-grid,
+    .details-grid,
+    .packages-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .services-hero {
+        min-height: 320px;
+    }
+
+    .services-hero-content {
+        padding: 30px 28px;
+    }
+
+    .services-hero-content h1 {
+        font-size: 32px;
+    }
+
+    .pricing-section,
+    .details-section,
+    .packages-section {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .details-panel,
+    .packages-container {
+        padding: 24px;
+    }
+}
