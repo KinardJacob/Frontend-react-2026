@@ -58,7 +58,7 @@ const About = () => {
             <section className="contact-section" id="contact">
                 <div className="contact-container">
                     <h2>Contact Me</h2>
-                    <p className="contact-intro">Tell me about your vision and I&apos;ll help plan your shoot.</p>
+                    <p className="contact-intro">Tell me about your vision and I'll help plan your shoot.</p>
                     <form className="contact-form" noValidate>
                         <label htmlFor="name">Name</label>
                         <input type="text" id="name" name="name" />
