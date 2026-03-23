@@ -1,0 +1,117 @@
+.behind-hero {
+    background: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)),
+        url('../images/family of four laugh.png') center/cover no-repeat;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 6px solid var(--separator-color);
+    padding: 24px;
+}
+
+.behind-hero-content {
+    text-align: center;
+    background-color: var(--color-cream-opaque);
+    padding: 34px 74px;
+    border-radius: 20px;
+}
+
+.behind-hero-content h1 {
+    margin: 0;
+    font-size: clamp(2rem, 4.6vw, 3.8rem);
+    text-shadow: var(--text-shadow);
+}
+
+.process-section,
+.closing-section {
+    padding: 60px 40px;
+    border-top: 6px solid var(--separator-color);
+}
+
+.process-container,
+.closing-container {
+    width: 96%;
+    max-width: 1400px;
+    margin: 0 auto;
+    background: var(--color-cream);
+    border-radius: 18px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(43, 43, 39, 0.04);
+    padding: 40px 44px;
+}
+
+.process-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
+}
+
+.process-image-wrap {
+    width: 52%;
+}
+
+.process-image-wrap img {
+    width: 100%;
+    height: auto;
+    border-radius: 22px;
+}
+
+.process-summary {
+    width: 44%;
+    background: var(--color-cream);
+    border-radius: 28px;
+    padding: 28px;
+}
+
+.process-summary p,
+.closing-container p {
+    margin: 0;
+    font-size: clamp(1.3rem, 2.6vw, 3rem);
+    line-height: 1.28;
+    font-weight: 700;
+}
+
+.closing-container {
+    border-radius: 28px;
+}
+
+.behind-reference-image {
+    display: none;
+}
+
+@media (max-width: 900px) {
+    .process-container {
+        flex-direction: column;
+    }
+
+    .process-image-wrap,
+    .process-summary {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .process-section,
+    .closing-section {
+        padding: 40px 20px;
+    }
+
+    .behind-hero-content {
+        padding: 28px 32px;
+    }
+
+    .behind-hero-content h1 {
+        font-size: 34px;
+    }
+
+    .process-container,
+    .closing-container {
+        padding: 28px 24px;
+    }
+
+    .process-summary p,
+    .closing-container p {
+        line-height: 1.32;
+    }
+}
