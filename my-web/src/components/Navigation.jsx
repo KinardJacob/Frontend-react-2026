@@ -17,8 +17,12 @@ const Navigation = () => {
     };
 
     const closeNav = () => {
-        setIsNavOpen(false);
+        if (window.innerWidth <= 768) {
+            setIsNavOpen(false);
+        }
     };
+
+    const navLabel = isNavOpen ? "Close navigation" : "Open navigation";
 
     return (
         <nav className="navbar" aria-label="Main navigation">
@@ -27,11 +31,11 @@ const Navigation = () => {
                 type="button"
                 className={`nav-toggle${isNavOpen ? " is-open" : ""}`}
                 onClick={toggleNav}
-                aria-label="Toggle navigation"
+                aria-label={navLabel}
                 aria-expanded={isNavOpen}
                 aria-controls="main-nav-list"
             >
-                <span className="nav-toggle-icon" aria-hidden="true">{isNavOpen ? "\u2191" : "\u2193"}</span>
+                <span className="nav-toggle-icon" aria-hidden="true">{isNavOpen ? "\u25b4" : "\u25be"}</span>
             </button>
             <ul id="main-nav-list" className={`nav-list${isNavOpen ? " is-open" : ""}`}>
                 {links.map((link) => (

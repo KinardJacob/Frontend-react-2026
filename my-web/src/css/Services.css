@@ -149,6 +149,17 @@
     font-size: 20px;
 }
 
+.packages-feedback {
+    margin: 0;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.packages-error {
+    color: #8c2a21;
+}
+
 .session-package-card {
     background-color: var(--color-white);
     border: 2px solid var(--nav-2);
