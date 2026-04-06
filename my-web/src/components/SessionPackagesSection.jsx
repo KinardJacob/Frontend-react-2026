@@ -1,11 +1,25 @@
 import { useEffect, useMemo, useState } from "react";
 import SessionPackageCard from "./SessionPackageCard";
 
-const jsonSources = [
-    "https://raw.githubusercontent.com/KinardJacob/KinardJacob.github.io/refs/heads/main/projects/project%207/packages.json",
-    `${process.env.PUBLIC_URL || ""}/packages.json`,
-    "/packages.json"
+const apiBase = process.env.REACT_APP_API_BASE_URL || "https://demo-backend-nllg.onrender.com";
+
+const apiSources = [
+    `${apiBase}/api/packages`,
+    `${apiBase}/api/session-packages`
 ];
+
+const resolveImageUrl = (imagePath) => {
+    if (!imagePath) {
+        return "";
+    }
+
+    if (/^https?:\/\//i.test(imagePath)) {
+        return imagePath;
+    }
+
+    const cleanedPath = imagePath.startsWith("/") ? imagePath.slice(1) : imagePath;
+    return `${apiBase}/${cleanedPath}`;
+};
 
 const normalizePackageItem = (item) => {
     const type = item.type || "Session";
@@ -13,11 +27,19 @@ const normalizePackageItem = (item) => {
     const location = item.location || "Location of your choice";
 
     return {
-        image: "",
+        id: item.id,
+        image: resolveImageUrl(item.image),
         title: item.title || "Photography Session",
         meta: `${type} • ${duration} • ${location}`,
         description: item.description || "Custom session details available on request.",
-        price: item.price || "Contact for pricing"
+        price: item.price || "Contact for pricing",
+        details: [
+            `Type: ${type}`,
+            `Duration: ${duration}`,
+            `Location: ${location}`,
+            item.editedPhotos ? `Edited Photos: ${item.editedPhotos}` : null,
+            item.revisions !== undefined ? `Revisions: ${item.revisions}` : null
+        ].filter(Boolean)
     };
 };
 
@@ -25,6 +47,7 @@ const SessionPackagesSection = () => {
     const [packages, setPackages] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
+    const [selectedPackage, setSelectedPackage] = useState(null);
 
     useEffect(() => {
         let isMounted = true;
@@ -33,7 +56,7 @@ const SessionPackagesSection = () => {
             setIsLoading(true);
             setError("");
 
-            for (const source of jsonSources) {
+            for (const source of apiSources) {
                 try {
                     const response = await fetch(source);
                     if (!response.ok) {
@@ -58,7 +81,7 @@ const SessionPackagesSection = () => {
             }
 
             if (isMounted) {
-                setError("Could not load photography sessions right now.");
+                setError("Could not load photography sessions right now. Check your server URL.");
                 setIsLoading(false);
             }
         };
@@ -82,7 +105,11 @@ const SessionPackagesSection = () => {
         return (
             <div className="packages-grid">
                 {packages.map((sessionPackage) => (
-                    <SessionPackageCard key={`${sessionPackage.title}-${sessionPackage.price}`} {...sessionPackage} />
+                    <SessionPackageCard
+                        key={`${sessionPackage.id || sessionPackage.title}-${sessionPackage.price}`}
+                        {...sessionPackage}
+                        onOpenDetails={() => setSelectedPackage(sessionPackage)}
+                    />
                 ))}
             </div>
         );
@@ -93,6 +120,45 @@ const SessionPackagesSection = () => {
             <div className="packages-container">
                 <h2>Popular Session Packages</h2>
                 {content}
+
+                {selectedPackage ? (
+                    <div
+                        className="package-modal-backdrop"
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => setSelectedPackage(null)}
+                        onKeyDown={(event) => {
+                            if (event.key === "Escape" || event.key === "Enter" || event.key === " ") {
+                                setSelectedPackage(null);
+                            }
+                        }}
+                    >
+                        <section
+                            className="package-modal"
+                            role="dialog"
+                            aria-modal="true"
+                            aria-label={`${selectedPackage.title} details`}
+                            onClick={(event) => event.stopPropagation()}
+                        >
+                            <button
+                                type="button"
+                                className="package-modal-close"
+                                onClick={() => setSelectedPackage(null)}
+                            >
+                                Close
+                            </button>
+                            <h3>{selectedPackage.title}</h3>
+                            <p className="session-package-meta">{selectedPackage.meta}</p>
+                            <p>{selectedPackage.description}</p>
+                            <ul className="package-modal-list">
+                                {selectedPackage.details?.map((detail) => (
+                                    <li key={detail}>{detail}</li>
+                                ))}
+                            </ul>
+                            <p className="session-package-price">{selectedPackage.price}</p>
+                        </section>
+                    </div>
+                ) : null}
             </div>
         </section>
     );
