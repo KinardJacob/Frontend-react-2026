@@ -1,5 +1,3 @@
-import { Link } from "react-router-dom";
-
 const ServicePlanCard = ({ title, price, features }) => {
     return (
         <article className="plan-card">
