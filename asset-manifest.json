@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/Frontend-react-2026/static/css/main.d04bc9c2.css",
-    "main.js": "/Frontend-react-2026/static/js/main.5cd9ff7a.js",
+    "main.js": "/Frontend-react-2026/static/js/main.46991979.js",
     "static/media/family of four laugh.png": "/Frontend-react-2026/static/media/family of four laugh.e17865d8c71d87c977ce.png",
     "static/media/a professional portr.png": "/Frontend-react-2026/static/media/a professional portr.e0c9980f3b377e38771d.png",
     "static/media/landscape-oriented 3i.png": "/Frontend-react-2026/static/media/landscape-oriented 3i.d505167bdc5dd1dcb5b0.png",
@@ -19,10 +19,10 @@
     "static/media/IMG_20250506_192646484_HDR_PORTRAIT.jpg": "/Frontend-react-2026/static/media/IMG_20250506_192646484_HDR_PORTRAIT.a5d8cc4127abad0caaf5.jpg",
     "index.html": "/Frontend-react-2026/index.html",
     "main.d04bc9c2.css.map": "/Frontend-react-2026/static/css/main.d04bc9c2.css.map",
-    "main.5cd9ff7a.js.map": "/Frontend-react-2026/static/js/main.5cd9ff7a.js.map"
+    "main.46991979.js.map": "/Frontend-react-2026/static/js/main.46991979.js.map"
   },
   "entrypoints": [
     "static/css/main.d04bc9c2.css",
-    "static/js/main.5cd9ff7a.js"
+    "static/js/main.46991979.js"
   ]
 }
