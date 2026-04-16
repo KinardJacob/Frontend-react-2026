@@ -2,7 +2,7 @@ import "../css/Services.css";
 import ServicePlanCard from "../components/ServicePlanCard";
 import ServiceDetailCard from "../components/ServiceDetailCard";
 import SessionPackagesSection from "../components/SessionPackagesSection";
-import CustomSessionBuilder from "../components/CustomSessionBuilder";
+import BookingForm from "../components/BookingForm";
 
 const pricingPlans = [
     { title: "Mini", price: "$10", features: "10 Pictures" },
@@ -46,7 +46,7 @@ const Services = () => {
 
             <SessionPackagesSection />
 
-            <CustomSessionBuilder />
+            <BookingForm />
         </main>
     );
 };

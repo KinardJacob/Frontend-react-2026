@@ -312,6 +312,82 @@
     color: var(--site-text);
 }
 
+/* New booking form styles */
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    grid-column: 1 / -1;
+}
+
+.input-error {
+    border-color: #c97676 !important;
+    box-shadow: 0 0 0 3px rgba(201, 118, 118, 0.2) !important;
+}
+
+.error-text {
+    color: #8c2a21;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+.character-count {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(59, 71, 37, 0.7);
+    text-align: right;
+    margin-top: 4px;
+}
+
+.form-feedback {
+    grid-column: 1 / -1;
+    padding: 14px 18px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    border: 2px solid transparent;
+}
+
+.form-feedback.success {
+    background: rgba(63, 114, 50, 0.12);
+    color: #304f24;
+    border-color: rgba(63, 114, 50, 0.28);
+}
+
+.form-feedback.error {
+    background: rgba(140, 42, 33, 0.1);
+    color: #8c2a21;
+    border-color: rgba(140, 42, 33, 0.28);
+}
+
+.submit-button {
+    grid-column: 1 / -1;
+    justify-self: start;
+    border: 0;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--nav-3) 0%, var(--nav-4) 100%);
+    color: var(--nav-1);
+    padding: 14px 30px;
+    font-family: inherit;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(38, 45, 22, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transition: filter 0.18s ease, transform 0.18s ease;
+}
+
+.submit-button:hover:not(:disabled) {
+    filter: brightness(0.92);
+    transform: translateY(-1px);
+}
+
+.submit-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
 .custom-field textarea {
     resize: vertical;
     min-height: 115px;
@@ -510,7 +586,8 @@
     .pricing-grid,
     .details-grid,
     .packages-grid,
-    .custom-builder-form {
+    .custom-builder-form,
+    .form-row {
         grid-template-columns: 1fr;
     }
 }
@@ -542,7 +619,8 @@
         padding: 24px;
     }
 
-    .custom-submit {
+    .custom-submit,
+    .submit-button {
         width: 100%;
         justify-self: stretch;
     }
