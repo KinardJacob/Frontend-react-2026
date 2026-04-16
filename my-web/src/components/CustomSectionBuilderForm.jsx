@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 
-const apiBase = process.env.REACT_APP_API_BASE_URL || "http://localhost:3001";
+const isLocalClient = typeof window !== "undefined" && window.location.hostname === "localhost";
+const defaultApiBase = isLocalClient ? "http://localhost:3001" : "https://demo-backend-nllg.onrender.com";
+const apiBase = process.env.REACT_APP_API_BASE_URL || defaultApiBase;
 const endpoint = process.env.REACT_APP_CUSTOM_SECTION_ENDPOINT || `${apiBase}/api/custom-sections`;
 const allowedSectionTypes = ["info", "feature", "testimonial", "offer"];
 
@@ -149,7 +151,11 @@ const CustomSectionBuilderForm = () => {
             setStatusMessage("Custom section submitted successfully.");
         } catch (submitError) {
             setSubmitStatus("error");
-            setStatusMessage(submitError.message || "Could not send section data. Check your API route and try again.");
+            if (submitError instanceof TypeError) {
+                setStatusMessage(`Could not reach API at ${endpoint}. Make sure your backend is running and CORS allows this origin.`);
+            } else {
+                setStatusMessage(submitError.message || "Could not send section data. Check your API route and try again.");
+            }
         } finally {
             setIsSubmitting(false);
         }
