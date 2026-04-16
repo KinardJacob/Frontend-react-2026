@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const isLocalClient = typeof window !== "undefined" && window.location.hostname === "localhost";
 const defaultApiBase = isLocalClient ? "http://localhost:3001" : "https://demo-backend-nllg.onrender.com";
@@ -60,6 +60,18 @@ const validateForm = (formValues) => {
     return nextErrors;
 };
 
+const parseSessionsResponse = (payload) => {
+    if (Array.isArray(payload)) {
+        return payload;
+    }
+
+    if (payload && Array.isArray(payload.customSections)) {
+        return payload.customSections;
+    }
+
+    return [];
+};
+
 const CustomSessionBuilder = () => {
     const [formValues, setFormValues] = useState(initialFormState);
     const [formErrors, setFormErrors] = useState({});
@@ -75,6 +87,52 @@ const CustomSessionBuilder = () => {
     const submitButtonLabel = isEditMode
         ? isSubmitting ? "Updating..." : "Update Session"
         : isSubmitting ? "Creating..." : "Create Session";
+
+    const requestWithFallback = async (pathSuffix, options) => {
+        const endpointsToTry = endpoint === fallbackEndpoint ? [endpoint] : [endpoint, fallbackEndpoint];
+        let networkError = null;
+
+        for (const baseEndpoint of endpointsToTry) {
+            const requestUrl = `${baseEndpoint}${pathSuffix}`;
+            setLastEndpointUsed(requestUrl);
+
+            try {
+                const response = await fetch(requestUrl, options);
+                return response;
+            } catch (error) {
+                networkError = error;
+            }
+        }
+
+        throw networkError || new TypeError("Network request failed.");
+    };
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const loadSessions = async () => {
+            try {
+                const response = await requestWithFallback("", { method: "GET" });
+                if (!response.ok) {
+                    return;
+                }
+
+                const data = await response.json();
+                const sessions = parseSessionsResponse(data);
+                if (isMounted) {
+                    setActiveSessions(sessions);
+                }
+            } catch {
+                // Keep the UI usable even if loading existing custom sessions fails.
+            }
+        };
+
+        loadSessions();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     const onInputChange = (event) => {
         const { name, value } = event.target;
@@ -93,11 +151,13 @@ const CustomSessionBuilder = () => {
         }
     };
 
-    const clearForm = () => {
+    const clearForm = (resetFeedback = true) => {
         setFormValues(initialFormState);
         setFormErrors({});
         setEditingId(null);
-        setFeedback({ type: "idle", message: "" });
+        if (resetFeedback) {
+            setFeedback({ type: "idle", message: "" });
+        }
     };
 
     const startEditSession = (sessionId) => {
@@ -116,18 +176,32 @@ const CustomSessionBuilder = () => {
         }
     };
 
-    const deleteSession = (sessionId) => {
-        setActiveSessions((prev) => prev.filter((s) => s.id !== sessionId));
-        if (editingId === sessionId) {
-            clearForm();
+    const deleteSession = async (sessionId) => {
+        try {
+            const response = await requestWithFallback(`/${sessionId}`, { method: "DELETE" });
+            if (!response.ok && response.status !== 404) {
+                throw new Error(`Delete failed (${response.status})`);
+            }
+
+            setActiveSessions((prev) => prev.filter((s) => s.id !== sessionId));
+            if (editingId === sessionId) {
+                clearForm(false);
+                setEditingId(null);
+            }
+
+            setFeedback({
+                type: "success",
+                message: "Session deleted successfully."
+            });
+            setTimeout(() => {
+                setFeedback({ type: "idle", message: "" });
+            }, 3000);
+        } catch (deleteError) {
+            setFeedback({
+                type: "error",
+                message: deleteError.message || "Could not delete this session."
+            });
         }
-        setFeedback({
-            type: "success",
-            message: "Session deleted from your list."
-        });
-        setTimeout(() => {
-            setFeedback({ type: "idle", message: "" });
-        }, 3000);
     };
 
     const onSubmit = async (event) => {
@@ -160,29 +234,12 @@ const CustomSessionBuilder = () => {
                 formData.append(key, value);
             });
 
-            const endpointsToTry = endpoint === fallbackEndpoint ? [endpoint] : [endpoint, fallbackEndpoint];
-            let response = null;
-            let networkError = null;
-
-            for (const candidateEndpoint of endpointsToTry) {
-                setLastEndpointUsed(candidateEndpoint);
-
-                try {
-                    response = await fetch(candidateEndpoint, {
-                        method: "POST",
-                        body: formData
-                    });
-
-                    networkError = null;
-                    break;
-                } catch (error) {
-                    networkError = error;
-                }
-            }
-
-            if (!response) {
-                throw networkError || new TypeError("Network request failed.");
-            }
+            const pathSuffix = isEditMode && editingId ? `/${editingId}` : "";
+            const method = isEditMode ? "PUT" : "POST";
+            const response = await requestWithFallback(pathSuffix, {
+                method,
+                body: formData
+            });
 
             if (!response.ok) {
                 let errorMessage = `Request failed with status ${response.status}`;
@@ -200,11 +257,11 @@ const CustomSessionBuilder = () => {
                 throw new Error(errorMessage);
             }
 
-            let createdSession = payload;
+            let returnedSession = payload;
             try {
                 const responseBody = await response.json();
                 if (responseBody && typeof responseBody === "object") {
-                    createdSession = {
+                    returnedSession = {
                         ...payload,
                         ...responseBody
                     };
@@ -213,28 +270,28 @@ const CustomSessionBuilder = () => {
                 // No JSON response body
             }
 
-            const sessionToAdd = {
-                id: createdSession.id || `local-${Date.now()}`,
-                ...createdSession
+            const sessionToStore = {
+                id: returnedSession.id || editingId || `local-${Date.now()}`,
+                ...returnedSession
             };
 
             if (isEditMode && editingId) {
                 setActiveSessions((prev) =>
-                    prev.map((s) => (s.id === editingId ? sessionToAdd : s))
+                    prev.map((s) => (s.id === editingId ? sessionToStore : s))
                 );
                 setFeedback({
                     type: "success",
-                    message: "Session updated successfully!"
+                    message: "Session updated successfully."
                 });
             } else {
-                setActiveSessions((previous) => [sessionToAdd, ...previous]);
+                setActiveSessions((previous) => [sessionToStore, ...previous]);
                 setFeedback({
                     type: "success",
-                    message: "Session created successfully!"
+                    message: "Session created successfully."
                 });
             }
 
-            clearForm();
+            clearForm(false);
             setTimeout(() => {
                 setFeedback({ type: "idle", message: "" });
             }, 4000);
@@ -260,7 +317,7 @@ const CustomSessionBuilder = () => {
             <div className="custom-builder-shell">
                 <h2 id="custom-builder-heading">Custom Session Builder</h2>
                 <p className="custom-builder-intro">
-                    Create, edit, and manage custom session offers. They'll be saved to your backend as you build them.
+                    Create, edit, and manage custom session offers. They are stored separately from predefined packages.
                 </p>
 
                 <form className="custom-builder-form" onSubmit={onSubmit} noValidate>
@@ -398,14 +455,14 @@ const CustomSessionBuilder = () => {
                                     <div className="session-package-content">
                                         <h3>{session.sectionTitle}</h3>
                                         <p className="session-package-meta">
-                                            {SESSION_TYPE_LABELS[session.sectionType] || session.sectionType} â€¢ Custom
+                                            {SESSION_TYPE_LABELS[session.sectionType] || session.sectionType} • Custom
                                         </p>
                                         <p>{session.introText}</p>
-                                        {session.ctaLabel && (
+                                        {session.ctaLabel ? (
                                             <p className="session-package-price">
                                                 Button: <strong>{session.ctaLabel}</strong>
                                             </p>
-                                        )}
+                                        ) : null}
                                         <div className="custom-session-actions">
                                             <button
                                                 type="button"
