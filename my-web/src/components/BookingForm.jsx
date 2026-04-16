@@ -116,9 +116,17 @@ const BookingForm = () => {
         setFeedback({ type: "idle", message: "" });
 
         try {
-            // Here you would typically send the booking data to your backend
-            // For now, we'll simulate a successful submission
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            const apiBase = process.env.REACT_APP_API_BASE_URL || "https://demo-backend-nllg.onrender.com";
+            const response = await fetch(`${apiBase}/api/bookings`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formValues),
+            });
+
+            if (!response.ok) {
+                const data = await response.json().catch(() => ({}));
+                throw new Error(data.message || "Server error");
+            }
 
             setFeedback({ 
                 type: "success", 
