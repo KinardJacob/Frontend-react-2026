@@ -8,52 +8,34 @@ const fallbackEndpoint = isLocalClient
     ? "https://demo-backend-nllg.onrender.com/api/custom-sections"
     : "http://localhost:3001/api/custom-sections";
 
-const SESSION_TYPES = ["info", "feature", "testimonial", "offer"];
-const SESSION_TYPE_LABELS = {
-    info: "Information",
-    feature: "Feature",
-    testimonial: "Testimonial",
-    offer: "Limited Offer"
-};
-
 const initialFormState = {
-    sectionTitle: "",
-    sectionType: "info",
-    introText: "",
-    ctaLabel: "",
-    ctaUrl: ""
+    sessionName: "",
+    description: "",
+    price: ""
 };
 
 const validateForm = (formValues) => {
     const nextErrors = {};
 
-    if (!formValues.sectionTitle.trim()) {
-        nextErrors.sectionTitle = "Session name is required.";
-    } else if (formValues.sectionTitle.trim().length < 3 || formValues.sectionTitle.trim().length > 60) {
-        nextErrors.sectionTitle = "Name must be between 3 and 60 characters.";
+    if (!formValues.sessionName.trim()) {
+        nextErrors.sessionName = "Session name is required.";
+    } else if (formValues.sessionName.trim().length < 3 || formValues.sessionName.trim().length > 60) {
+        nextErrors.sessionName = "Name must be between 3 and 60 characters.";
     }
 
-    const normalizedType = formValues.sectionType.trim().toLowerCase();
-    if (!normalizedType) {
-        nextErrors.sectionType = "Session type is required.";
-    } else if (!SESSION_TYPES.includes(normalizedType)) {
-        nextErrors.sectionType = `Session type must be one of: ${SESSION_TYPES.join(", ")}.`;
+    if (!formValues.description.trim()) {
+        nextErrors.description = "Session description is required.";
+    } else if (formValues.description.trim().length < 20 || formValues.description.trim().length > 260) {
+        nextErrors.description = "Description must be between 20 and 260 characters.";
     }
 
-    if (!formValues.introText.trim()) {
-        nextErrors.introText = "Session description is required.";
-    } else if (formValues.introText.trim().length < 20 || formValues.introText.trim().length > 260) {
-        nextErrors.introText = "Description must be between 20 and 260 characters.";
-    }
-
-    if (formValues.ctaLabel && formValues.ctaLabel.trim().length > 30) {
-        nextErrors.ctaLabel = "Button text must be 30 characters or less.";
-    }
-
-    if (formValues.ctaUrl) {
-        const allowedProtocols = /^(https?:\/\/)/i;
-        if (!allowedProtocols.test(formValues.ctaUrl.trim())) {
-            nextErrors.ctaUrl = "Button link must start with http:// or https://.";
+    if (!formValues.price.trim()) {
+        nextErrors.price = "Price is required.";
+    } else {
+        const normalizedPrice = formValues.price.trim().replace("$", "");
+        const numericPrice = Number(normalizedPrice);
+        if (!Number.isFinite(numericPrice) || numericPrice <= 0) {
+            nextErrors.price = "Price must be a positive number.";
         }
     }
 
@@ -77,16 +59,11 @@ const CustomSessionBuilder = () => {
     const [formErrors, setFormErrors] = useState({});
     const [activeSessions, setActiveSessions] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [editingId, setEditingId] = useState(null);
     const [feedback, setFeedback] = useState({ type: "idle", message: "" });
     const [lastEndpointUsed, setLastEndpointUsed] = useState(endpoint);
 
-    const titleCount = useMemo(() => formValues.sectionTitle.trim().length, [formValues.sectionTitle]);
-    const introCount = useMemo(() => formValues.introText.trim().length, [formValues.introText]);
-    const isEditMode = Boolean(editingId);
-    const submitButtonLabel = isEditMode
-        ? isSubmitting ? "Updating..." : "Update Session"
-        : isSubmitting ? "Creating..." : "Create Session";
+    const nameCount = useMemo(() => formValues.sessionName.trim().length, [formValues.sessionName]);
+    const descriptionCount = useMemo(() => formValues.description.trim().length, [formValues.description]);
 
     const requestWithFallback = async (pathSuffix, options) => {
         const endpointsToTry = endpoint === fallbackEndpoint ? [endpoint] : [endpoint, fallbackEndpoint];
@@ -154,25 +131,8 @@ const CustomSessionBuilder = () => {
     const clearForm = (resetFeedback = true) => {
         setFormValues(initialFormState);
         setFormErrors({});
-        setEditingId(null);
         if (resetFeedback) {
             setFeedback({ type: "idle", message: "" });
-        }
-    };
-
-    const startEditSession = (sessionId) => {
-        const session = activeSessions.find((s) => s.id === sessionId);
-        if (session) {
-            setFormValues({
-                sectionTitle: session.sectionTitle,
-                sectionType: session.sectionType,
-                introText: session.introText,
-                ctaLabel: session.ctaLabel,
-                ctaUrl: session.ctaUrl
-            });
-            setEditingId(sessionId);
-            setFeedback({ type: "idle", message: "" });
-            window.scrollTo({ top: 0, behavior: "smooth" });
         }
     };
 
@@ -184,11 +144,6 @@ const CustomSessionBuilder = () => {
             }
 
             setActiveSessions((prev) => prev.filter((s) => s.id !== sessionId));
-            if (editingId === sessionId) {
-                clearForm(false);
-                setEditingId(null);
-            }
-
             setFeedback({
                 type: "success",
                 message: "Session deleted successfully."
@@ -222,11 +177,14 @@ const CustomSessionBuilder = () => {
 
         try {
             const payload = {
-                sectionTitle: formValues.sectionTitle.trim(),
-                sectionType: formValues.sectionType.trim().toLowerCase(),
-                introText: formValues.introText.trim(),
-                ctaLabel: formValues.ctaLabel.trim(),
-                ctaUrl: formValues.ctaUrl.trim()
+                sessionName: formValues.sessionName.trim(),
+                description: formValues.description.trim(),
+                price: formValues.price.trim(),
+                sectionTitle: formValues.sessionName.trim(),
+                sectionType: "offer",
+                introText: formValues.description.trim(),
+                ctaLabel: formValues.price.trim(),
+                ctaUrl: ""
             };
 
             const formData = new FormData();
@@ -234,10 +192,8 @@ const CustomSessionBuilder = () => {
                 formData.append(key, value);
             });
 
-            const pathSuffix = isEditMode && editingId ? `/${editingId}` : "";
-            const method = isEditMode ? "PUT" : "POST";
-            const response = await requestWithFallback(pathSuffix, {
-                method,
+            const response = await requestWithFallback("", {
+                method: "POST",
                 body: formData
             });
 
@@ -246,7 +202,12 @@ const CustomSessionBuilder = () => {
                 try {
                     const errorBody = await response.json();
                     if (errorBody?.errors && typeof errorBody.errors === "object") {
-                        setFormErrors(errorBody.errors);
+                        const mappedErrors = {
+                            sessionName: errorBody.errors.sectionTitle,
+                            description: errorBody.errors.introText,
+                            price: errorBody.errors.ctaLabel || errorBody.errors.price
+                        };
+                        setFormErrors(Object.fromEntries(Object.entries(mappedErrors).filter(([, value]) => Boolean(value))));
                     }
                     if (errorBody?.message) {
                         errorMessage = errorBody.message;
@@ -257,12 +218,17 @@ const CustomSessionBuilder = () => {
                 throw new Error(errorMessage);
             }
 
-            let returnedSession = payload;
+            let returnedSession = {
+                sectionTitle: payload.sectionTitle,
+                introText: payload.introText,
+                ctaLabel: payload.price
+            };
+
             try {
                 const responseBody = await response.json();
                 if (responseBody && typeof responseBody === "object") {
                     returnedSession = {
-                        ...payload,
+                        ...returnedSession,
                         ...responseBody
                     };
                 }
@@ -271,25 +237,17 @@ const CustomSessionBuilder = () => {
             }
 
             const sessionToStore = {
-                id: returnedSession.id || editingId || `local-${Date.now()}`,
-                ...returnedSession
+                id: returnedSession.id || `local-${Date.now()}`,
+                sectionTitle: returnedSession.sectionTitle || payload.sessionName,
+                introText: returnedSession.introText || payload.description,
+                ctaLabel: returnedSession.price || returnedSession.ctaLabel || payload.price
             };
 
-            if (isEditMode && editingId) {
-                setActiveSessions((prev) =>
-                    prev.map((s) => (s.id === editingId ? sessionToStore : s))
-                );
-                setFeedback({
-                    type: "success",
-                    message: "Session updated successfully."
-                });
-            } else {
-                setActiveSessions((previous) => [sessionToStore, ...previous]);
-                setFeedback({
-                    type: "success",
-                    message: "Session created successfully."
-                });
-            }
+            setActiveSessions((previous) => [sessionToStore, ...previous]);
+            setFeedback({
+                type: "success",
+                message: "Session created successfully."
+            });
 
             clearForm(false);
             setTimeout(() => {
@@ -317,124 +275,78 @@ const CustomSessionBuilder = () => {
             <div className="custom-builder-shell">
                 <h2 id="custom-builder-heading">Custom Session Builder</h2>
                 <p className="custom-builder-intro">
-                    Create, edit, and manage custom session offers. They are stored separately from predefined packages.
+                    Create and manage custom session offers. They are stored separately from predefined packages.
                 </p>
 
                 <form className="custom-builder-form" onSubmit={onSubmit} noValidate>
-                    <label className="custom-field" htmlFor="sectionTitle">
+                    <label className="custom-field" htmlFor="sessionName">
                         Session Name
                         <input
-                            id="sectionTitle"
-                            name="sectionTitle"
+                            id="sessionName"
+                            name="sessionName"
                             type="text"
-                            value={formValues.sectionTitle}
+                            value={formValues.sessionName}
                             onChange={onInputChange}
                             placeholder="Ex: Couples Golden Hour"
-                            aria-invalid={Boolean(formErrors.sectionTitle)}
-                            aria-describedby={formErrors.sectionTitle ? "sectionTitle-error" : "sectionTitle-hint"}
+                            aria-invalid={Boolean(formErrors.sessionName)}
+                            aria-describedby={formErrors.sessionName ? "sessionName-error" : "sessionName-hint"}
                         />
-                        <small id="sectionTitle-hint" className="field-hint">
-                            3 to 60 characters ({titleCount}/60)
+                        <small id="sessionName-hint" className="field-hint">
+                            3 to 60 characters ({nameCount}/60)
                         </small>
-                        {formErrors.sectionTitle ? (
-                            <small id="sectionTitle-error" className="field-error">
-                                {formErrors.sectionTitle}
+                        {formErrors.sessionName ? (
+                            <small id="sessionName-error" className="field-error">
+                                {formErrors.sessionName}
                             </small>
                         ) : null}
                     </label>
 
-                    <label className="custom-field" htmlFor="sectionType">
-                        Session Type
-                        <select
-                            id="sectionType"
-                            name="sectionType"
-                            value={formValues.sectionType}
-                            onChange={onInputChange}
-                            aria-invalid={Boolean(formErrors.sectionType)}
-                            aria-describedby={formErrors.sectionType ? "sectionType-error" : undefined}
-                        >
-                            {SESSION_TYPES.map((type) => (
-                                <option key={type} value={type}>
-                                    {SESSION_TYPE_LABELS[type]}
-                                </option>
-                            ))}
-                        </select>
-                        {formErrors.sectionType ? (
-                            <small id="sectionType-error" className="field-error">
-                                {formErrors.sectionType}
-                            </small>
-                        ) : null}
-                    </label>
-
-                    <label className="custom-field custom-field-full" htmlFor="introText">
-                        Session Description
+                    <label className="custom-field custom-field-full" htmlFor="description">
+                        Description
                         <textarea
-                            id="introText"
-                            name="introText"
-                            value={formValues.introText}
+                            id="description"
+                            name="description"
+                            value={formValues.description}
                             onChange={onInputChange}
                             rows={4}
-                            placeholder="What makes this session special? Include details about location, vibe, and what clients get..."
-                            aria-invalid={Boolean(formErrors.introText)}
-                            aria-describedby={formErrors.introText ? "introText-error" : "introText-hint"}
+                            placeholder="Describe what makes this custom session special."
+                            aria-invalid={Boolean(formErrors.description)}
+                            aria-describedby={formErrors.description ? "description-error" : "description-hint"}
                         />
-                        <small id="introText-hint" className="field-hint">
-                            20 to 260 characters ({introCount}/260)
+                        <small id="description-hint" className="field-hint">
+                            20 to 260 characters ({descriptionCount}/260)
                         </small>
-                        {formErrors.introText ? (
-                            <small id="introText-error" className="field-error">
-                                {formErrors.introText}
+                        {formErrors.description ? (
+                            <small id="description-error" className="field-error">
+                                {formErrors.description}
                             </small>
                         ) : null}
                     </label>
 
-                    <label className="custom-field" htmlFor="ctaLabel">
-                        Booking Button Text (Optional)
+                    <label className="custom-field" htmlFor="price">
+                        Price
                         <input
-                            id="ctaLabel"
-                            name="ctaLabel"
+                            id="price"
+                            name="price"
                             type="text"
-                            value={formValues.ctaLabel}
+                            value={formValues.price}
                             onChange={onInputChange}
-                            placeholder="Ex: Reserve Now"
-                            aria-invalid={Boolean(formErrors.ctaLabel)}
-                            aria-describedby={formErrors.ctaLabel ? "ctaLabel-error" : undefined}
+                            placeholder="Ex: $175"
+                            aria-invalid={Boolean(formErrors.price)}
+                            aria-describedby={formErrors.price ? "price-error" : "price-hint"}
                         />
-                        {formErrors.ctaLabel ? (
-                            <small id="ctaLabel-error" className="field-error">
-                                {formErrors.ctaLabel}
-                            </small>
-                        ) : null}
-                    </label>
-
-                    <label className="custom-field" htmlFor="ctaUrl">
-                        Booking Button Link (Optional)
-                        <input
-                            id="ctaUrl"
-                            name="ctaUrl"
-                            type="url"
-                            value={formValues.ctaUrl}
-                            onChange={onInputChange}
-                            placeholder="https://calendly.com/yourname"
-                            aria-invalid={Boolean(formErrors.ctaUrl)}
-                            aria-describedby={formErrors.ctaUrl ? "ctaUrl-error" : undefined}
-                        />
-                        {formErrors.ctaUrl ? (
-                            <small id="ctaUrl-error" className="field-error">
-                                {formErrors.ctaUrl}
+                        <small id="price-hint" className="field-hint">Enter a positive value (ex: 175 or $175)</small>
+                        {formErrors.price ? (
+                            <small id="price-error" className="field-error">
+                                {formErrors.price}
                             </small>
                         ) : null}
                     </label>
 
                     <div className="custom-form-actions">
                         <button className="custom-submit" type="submit" disabled={isSubmitting}>
-                            {submitButtonLabel}
+                            {isSubmitting ? "Creating..." : "Create Session"}
                         </button>
-                        {isEditMode && (
-                            <button className="custom-cancel" type="button" onClick={clearForm}>
-                                Cancel
-                            </button>
-                        )}
                     </div>
                 </form>
 
@@ -454,23 +366,11 @@ const CustomSessionBuilder = () => {
                                 <article key={session.id} className="session-package-card custom-session-card">
                                     <div className="session-package-content">
                                         <h3>{session.sectionTitle}</h3>
-                                        <p className="session-package-meta">
-                                            {SESSION_TYPE_LABELS[session.sectionType] || session.sectionType} • Custom
-                                        </p>
                                         <p>{session.introText}</p>
-                                        {session.ctaLabel ? (
-                                            <p className="session-package-price">
-                                                Button: <strong>{session.ctaLabel}</strong>
-                                            </p>
-                                        ) : null}
+                                        <p className="session-package-price">
+                                            Price: <strong>{session.price || session.ctaLabel}</strong>
+                                        </p>
                                         <div className="custom-session-actions">
-                                            <button
-                                                type="button"
-                                                className="action-edit"
-                                                onClick={() => startEditSession(session.id)}
-                                            >
-                                                Edit
-                                            </button>
                                             <button
                                                 type="button"
                                                 className="action-delete"
