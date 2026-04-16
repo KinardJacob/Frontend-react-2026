@@ -31,7 +31,7 @@ const Home = () => {
                             indoor session or a scenic outdoor shoot, I&apos;ll help you preserve memories that last a
                             lifetime.
                         </p>
-                        <Link className="book-button" to="/about">
+                        <Link className="book-button" to="/services#booking-form">
                             Book Now!
                         </Link>
                     </div>

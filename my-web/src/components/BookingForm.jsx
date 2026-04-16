@@ -156,7 +156,7 @@ const BookingForm = () => {
     };
 
     return (
-        <section className="custom-builder-section" aria-labelledby="booking-form-heading">
+        <section id="booking-form" className="custom-builder-section" aria-labelledby="booking-form-heading">
             <div className="custom-builder-shell">
                 <h2 id="booking-form-heading">Book Your Session</h2>
                 <p className="custom-builder-intro">
